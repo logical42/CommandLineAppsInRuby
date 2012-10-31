@@ -1,0 +1,139 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH << File.expand_path(File.dirname(__FILE__) + '/../lib')
+require 'rubygems'
+require 'gli'
+require 'todo_version'
+
+include GLI
+
+version Todo::VERSION
+
+switch "force-tty"
+
+#START:global_flag
+desc "Path to the todo file"
+arg_name "todo_file"
+#START_HIGHLIGHT
+default_value "~/.todo.txt"
+#END_HIGHLIGHT
+flag [:f,:filename]
+#END:global_flag
+
+#START:new
+desc 'Create a new task in the task list'
+long_desc """
+A task has a name and a priority. By default, new
+tasks have the lowest possible priority, though
+this can be overridden.  If task_name is omitted,
+read tasks from the standard input.
+"""
+arg_name '[task_name...]'
+command :new do |c|
+
+  c.desc 'set the priority of the new task, 1 being the highest'
+  c.arg_name 'priority'
+  c.flag :p
+
+  c.desc 'put the new task first in the list'
+  c.switch :f
+
+  #START:stdin
+  c.action do |global_options,options,task_names|
+    File.open(global_options[:filename],'a+') do |todo_file|
+      #START_HIGHLIGHT
+      if task_names.empty?
+        puts "Reading new tasks from stdin..."
+        task_names = STDIN.readlines.map { |a| a.chomp }
+      end
+      #END_HIGHLIGHT
+      tasks = 0
+      task_names.each do |task| 
+        todo_file.puts [task,Time.now].join(',')
+        tasks += 1
+      end
+      #START_HIGHLIGHT
+      if tasks == 0
+        raise "You must provide tasks on the command-line or standard input" 
+      end
+      #END_HIGHLIGHT
+    end
+    #END:stdin
+  end
+end
+#END:new
+
+#START:alias
+#START_HIGHLIGHT
+command [:list,:ls] do |c|
+#END_HIGHLIGHT
+
+  # ...
+#END:alias
+
+#START:alias
+
+end
+#END:alias
+
+#START:tty
+desc 'List tasks'
+command [:list,:ls] do |c|
+
+  c.desc 'Format of the output (pretty for TTY, csv otherwise)'
+  c.arg_name 'csv|pretty'
+  #START_HIGHLIGHT
+  # explicit default removed
+  #END_HIGHLIGHT
+  c.flag :format
+
+  c.action do |global_options,options,args|
+#END:tty
+    if global_options[:'force-tty']
+      def STDOUT.tty?
+        true
+      end
+    end
+#START:tty
+    #START_HIGHLIGHT
+    if options[:format].nil?
+      if STDOUT.tty? 
+      #END_HIGHLIGHT
+        options[:format] = 'pretty'
+      else
+        options[:format] = 'csv'
+      end
+    end
+
+    # ...
+    
+#END:tty
+    File.open(global_options[:filename]) do |file|
+      index = 1
+      file.readlines.each do |todo|
+        name,created,completed = todo.chomp.split(/,/)
+        if options[:format] == 'pretty'
+          # Use the pretty-print format
+          printf("%2d - %s\n",index,name)
+          printf("     %-10s %s\n","Created:",created)
+          printf("     %-10s %s\n","Completed:",completed) if completed
+        elsif options[:format] == 'csv'
+          # Use the machine-readable CSV format
+          complete_flag = completed ? "C" : "U"
+          printf("%d,%s,%s,%s,%s\n",index,name,complete_flag,created,completed)
+        end
+        index += 1
+      end
+    end
+#START:tty
+  end
+end
+#END:tty
+
+desc 'Complete a task'
+command :done do |c|
+  c.action do |global_options,options,args|
+  end
+end
+
+exit run(ARGV)

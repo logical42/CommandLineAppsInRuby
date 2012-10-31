@@ -1,0 +1,150 @@
+#!/usr/bin/env ruby
+
+#START:require
+require 'json'
+require 'readline'
+require 'optparse'
+#END:require
+
+#START:main
+#START:main_shell
+def main(json_file)
+  root = JSON.parse(File.read(json_file))
+  command = nil
+#END:main_shell
+
+#START_HIGHLIGHT
+  current_context = Context.new(root,nil)
+#END_HIGHLIGHT
+#START:main_shell
+
+  while command != 'exit'
+    command = Readline.readline("> ",true)
+    break if command.nil?
+    # execute the command
+#END:main_shell
+    #START_HIGHLIGHT
+    current_context = execute_command(command.strip,current_context)
+    #END_HIGHLIGHT
+#START:main_shell
+  end
+end
+#END:main_shell
+#END:main
+
+#START:execute_command
+def execute_command(command,current_context)
+  case command
+  when /^ls$/
+    #START_HIGHLIGHT
+    puts current_context.to_s
+    #END_HIGHLIGHT
+  when /^cd (.*$)/
+    #START_HIGHLIGHT
+    new_context = current_context.cd($1)
+    #END_HIGHLIGHT
+    if new_context.nil?
+      puts "No such key #{$1}"
+    else
+      current_context = new_context
+    end
+  when /^cat (.*)$/
+    #START_HIGHLIGHT
+    item = current_context.cat($1)
+    #END_HIGHLIGHT
+    if item.nil?
+      puts "No such item #{$1}"
+    else
+      puts item.inspect
+    end
+  when /^help$/
+    puts "cat <item> - print the contents of <item> in the current context"
+    puts "cd  <item> - change context to the context of <item>"
+    puts "cd  ..     - change up one level"
+    puts "ls         - list available items in the current context"
+  end
+  current_context
+end
+#END:execute_command
+
+#START:context_basics
+class Context
+  attr_reader :here
+  attr_reader :parent_context
+
+  def initialize(here,parent_context)
+    @here = here
+    @parent_context = parent_context
+  end
+#END:context_basics
+
+  #START:cat_cd
+  def cat(path)
+    item_at(path)
+  end
+
+  def cd(path)
+    if path == '..'
+      self.parent_context
+    else
+      item = item_at(path)
+      if item.nil?
+        nil
+      else
+        Context.new(item,self)
+      end
+    end
+  end
+  #END:cat_cd
+
+  #START:to_s
+  def to_s
+    if self.here.kind_of? Array
+      indices = []
+      self.here.each_index { |i| indices << i }
+      indices.join(' ')
+    elsif self.here.kind_of? Hash
+      self.here.keys.join(' ')
+    else
+      self.here.to_s
+    end
+  end
+  #END:to_s
+
+  #START:cat_cd
+  private 
+  
+  def item_at(path)
+    if path == '..'
+      self.parent_context.here
+    elsif self.here.kind_of? Array
+      self.here[path.to_i]
+    elsif self.here.kind_of? Hash
+      self.here[path]
+    else
+      nil
+    end
+  end
+  #END:cat_cd
+#START:context_basics
+end
+#END:context_basics
+
+#START:ui
+option_parser = OptionParser.new do |opts|
+  executable_name = File.basename($PROGRAM_NAME)
+  opts.banner = "Interactively browse a JSON file
+  
+Usage: #{executable_name} json_file"
+end
+
+option_parser.parse!
+
+json_file = ARGV.shift
+if json_file && File.exists?(json_file)
+  main(json_file)
+else
+  STDERR.puts "error: you must provide a JSON file as an argument"
+  exit 1
+end
+#END:ui

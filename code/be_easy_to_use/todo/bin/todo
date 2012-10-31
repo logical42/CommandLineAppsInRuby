@@ -1,0 +1,46 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH << File.expand_path(File.dirname(__FILE__) + '/../lib')
+#START:setup
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'gli'
+include GLI
+#END:setup
+
+#START:global_options
+switch :s
+flag   :f
+#END:global_options
+
+#START:new
+command :new do |c|
+
+  c.switch :s
+  c.flag :f
+
+  c.action do |global_options,options,args|
+    # Your command logic here
+     
+    # If you have any errors, just raise them
+    # raise "that command made no sense"
+  end
+end
+#END:new
+
+#START:other_commands
+command :list do |c|
+  c.action do |global_options,options,args|
+  end
+end
+
+command :done do |c|
+  c.action do |global_options,options,args|
+  end
+end
+#END:other_commands
+
+#START:run
+exit run(ARGV)
+#END:run

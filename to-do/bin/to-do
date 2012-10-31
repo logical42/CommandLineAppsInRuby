@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+require 'gli'
+include GLI
+
+command :new do |c|
+  c.flag :f
+  c.switch :s
+  c.action do |global_opts, opts, args|
+    puts "new"
+  end
+end 
+command :list do |c|
+
+  c.action do |global_opts, opts, args|
+    puts "list"
+  end
+end 
+command :done do |c|
+  c.action do |global_opts, opts, args|
+    puts "action"
+  end
+end 
+exit GLI.run(ARGV)
