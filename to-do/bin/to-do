@@ -1,7 +1,21 @@
 #!/usr/bin/env ruby
-require 'gli'
-include GLI
+#START:load_path
+# This line can be removed
+$LOAD_PATH << File.expand_path(File.dirname(__FILE__) + '/../lib')
 
+require 'rubygems'
+require 'gli'
+
+#END:load_path
+require 'to-do'
+
+include GLI::App
+
+version ToDo::VERSION
+config_file File.join(ENV['HOME'],'.to-do.rc.yaml')
+
+default_value File.join(ENV['HOME'],'.to-do.txt')
+flag [:f,:filename]
 command :new do |c|
   c.flag :f
   c.switch :s
@@ -20,4 +34,4 @@ command :done do |c|
     puts "action"
   end
 end 
-exit GLI.run(ARGV)
+run(ARGV)
