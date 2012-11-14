@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+puts ARGV
+aaa = 'aaa'
+puts "out of class"
+puts aaa
+class SomeClass
+  aaa = "bbb"
+  puts "in class"
+  puts aaa
+  def some_method
+    # aaa = 1
+    # puts "in method"
+    # proc = Proc.new {|num| aaa+1}
+    # puts aaa
+    # return proc
+  end
+  ourproc = SomeClass.new.some_method
+  # puts "proc" 
+  # puts ourproc.call
+  # puts ourproc.call
+  # puts "in class again"
+  # puts aaa
+end
+puts "outside class"
+puts aaa

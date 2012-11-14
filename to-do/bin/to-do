@@ -12,26 +12,33 @@ require 'to-do'
 include GLI::App
 
 version ToDo::VERSION
+puts ENV['HOME']
 config_file File.join(ENV['HOME'],'.to-do.rc.yaml')
-
 default_value File.join(ENV['HOME'],'.to-do.txt')
+
 flag [:f,:filename]
+switch :s
 command :new do |c|
   c.flag :f
   c.switch :s
   c.action do |global_opts, opts, args|
-    puts "new"
+    puts "global"
+    puts global_opts
+    puts "opts"
+    puts opts
+    puts "args"
+    puts args
   end
 end 
 command :list do |c|
-
   c.action do |global_opts, opts, args|
     puts "list"
+
   end
 end 
 command :done do |c|
   c.action do |global_opts, opts, args|
     puts "action"
   end
-end 
+end
 run(ARGV)

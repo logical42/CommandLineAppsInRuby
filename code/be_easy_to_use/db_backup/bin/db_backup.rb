@@ -20,21 +20,25 @@ option_parser = OptionParser.new do |opts|
   end
 
   # Create a flag
-  opts.on("-u USER") do |user|
+  # opts.on("-u USER") do |user|
+  #   options[:user] = user
+  # end
+  # opts.on("-u USER") do |user|
+  #   unless user =~ /^.+\..+$/
+  #     raise ArgumentError,"USER must be in 'first.last' format" 
+  #   end
+  #   options[:user] = user
+  # end
+  opts.on("-u USER", "Asdfasdf", "asfd",
+          /^.+\..+$/, "asdf") do |user|
     options[:user] = user
-  end
-  opts.on("-u USER") do |user|
-    unless user =~ /^.+\..+$/
-      raise ArgumentError,"USER must be in 'first.last' format" 
+    begin
+    rescue OptionParser::InvalidArgument
+      puts "Adsf"
     end
-    options[:user] = user
-  end
-  opts.on("-u USER",
-          /^.+\..+$/) do |user|
-    options[:user] = user
   end
 
-  opts.on("-p PASSWORD") do |password|
+  opts.on("-p PASSWORD", Integer) do |password|
     options[:password] = password
   end
 end

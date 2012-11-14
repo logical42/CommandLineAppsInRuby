@@ -1,0 +1,10 @@
+source :rubygems
+gemspec
+
+gem 'rspec'
+gem "spork"
+gem 'sqlite3'
+gem "guard-rspec"
+gem "guard-livereload"
+gem "guard-spork"
+gem 'rb-fsevent', '~> 0.9.1'

@@ -1,0 +1,5 @@
+= db_backup
+
+Generate this with
+    db_backup rdoc
+After you have described your command line interface
