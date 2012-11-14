@@ -2,6 +2,7 @@
 require 'gli'
 require 'optparse'
 require 'db_backup'
+require 'open3'
 include GLI::App
 
 program_desc 'back up databases'
@@ -26,12 +27,29 @@ option_parser = OptionParser.new do |opts|
 end
 option_parser.parse!
 
+auth = ""
+auth += "-u#{options[:user]}" if options[:user]
+auth += "-u#{options[:password]}" if options[:password]
+database_name = ARGV[0]
+output_file = "#{database_name}.sql"
+
+
 if options[:test] 
   STDOUT.puts("---username=#{options[:user]}")
   STDOUT.puts("---password=#{options[:password]}")
 end
-auth = ""
-auth += "-u#{options[:user]}" if options[:user]
-auth += "-u#{options[:password]}" if options[:password]
+
+if ARGV.empty?
+  STDERR.puts "Error: You must suppy a database name."
+  exit 2
+end
+
+command = "mysqldump #{auth}#{database_name} > #{output_file}"
+stdout_str, stderr_str, status = Open3.capture3(command)
+if not status.success?
+  STDERR.puts "There was a problem running #{command}"
+  exit 1
+end
+
 
 run(ARGV)
