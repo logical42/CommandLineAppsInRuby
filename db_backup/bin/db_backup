@@ -23,7 +23,6 @@ option_parser = OptionParser.new do |opts|
   opts.on("-p PASSWORD") do |password|
     options[:password] = password
   end
-
 end
 option_parser.parse!
 

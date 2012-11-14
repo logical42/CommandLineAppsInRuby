@@ -17,7 +17,7 @@
 guard 'rspec', :version => 2 do
   watch(%r{^spec/.+_spec\.rb$})
   watch('spec/spec_helper.rb')  { "spec" }
-  watch('bin/db_backup.rb')  { "spec" }
+  watch('bin/db_backup')  { "spec" }
   # Rails example
 
 end
