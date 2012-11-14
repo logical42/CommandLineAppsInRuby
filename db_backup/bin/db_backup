@@ -37,7 +37,6 @@ if options[:test]
   STDOUT.puts("---username=#{options[:user]}")
   STDOUT.puts("---password=#{options[:password]}")
 end
-
 if ARGV.empty?
   STDERR.puts "Error: You must suppy a database name."
   exit 2
